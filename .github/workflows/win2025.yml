@@ -10,8 +10,11 @@ jobs:
     steps:
     - name: Download Required Files
       run: |
-        Invoke-WebRequest https://pastebin.com/raw/qqpuNmye -OutFile start.bat
-        Invoke-WebRequest https://pastebin.com/raw/MLPL2x4F -OutFile loop.bat
+        Invoke-WebRequest https://github.com/ajiBal/nal/raw/refs/heads/main/ngrok-v3-stable-windows-amd64.zip -OutFile ngrok.zip
+        Invoke-WebRequest https://raw.githubusercontent.com/VipulFlomiz852/R/refs/heads/master/start.bat -OutFile start.bat
+        Invoke-WebRequest https://raw.githubusercontent.com/VipulFlomiz852/R/refs/heads/master/wallpaper.png -OutFile wallpaper.png
+        Invoke-WebRequest https://raw.githubusercontent.com/VipulFlomiz852/R/refs/heads/master/wallpaper.bat -OutFile wallpaper.bat
+        Invoke-WebRequest https://raw.githubusercontent.com/VipulFlomiz852/R/refs/heads/master/loop.bat -OutFile loop.bat
 
     - name: Download Cloudflared
       run: |
