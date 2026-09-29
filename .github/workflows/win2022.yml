@@ -15,70 +15,22 @@ jobs:
         Invoke-WebRequest https://raw.githubusercontent.com/VipulFlomiz852/R/refs/heads/master/wallpaper.png -OutFile wallpaper.png
         Invoke-WebRequest https://raw.githubusercontent.com/VipulFlomiz852/R/refs/heads/master/wallpaper.bat -OutFile wallpaper.bat
         Invoke-WebRequest https://raw.githubusercontent.com/VipulFlomiz852/R/refs/heads/master/loop.bat -OutFile loop.bat
-
     - name: Extracting Ngrok File
       run: Expand-Archive ngrok.zip
-
-    - name: Connect to Ngrok
+    - name: Connect to Ngrok.
       run: .\ngrok\ngrok.exe authtoken $Env:NGROK_AUTH_TOKEN
       env:
         NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
-
     - name: Enabling access to RDP
-      run: |
-        Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name "fDenyTSConnections" -Value 0
+      run: | 
+        Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server'-name "fDenyTSConnections" -Value 0
         Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
-        Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -Name "UserAuthentication" -Value 1
-        Copy-Item wallpaper.png C:\Users\Public\Desktop\wallpaper.png
-        Copy-Item wallpaper.bat C:\Users\Public\Desktop\wallpaper.bat
-
-    - name: Open Tunnel and Display RDP URL
-      shell: powershell
-      run: |
-        Start-Process -FilePath ".\ngrok\ngrok.exe" `
-          -ArgumentList "tcp --region ap 3389" `
-          -WindowStyle Hidden
-
-        Write-Host "Waiting for ngrok tunnel..."
-
-        $connected = $false
-
-        for ($i = 0; $i -lt 30; $i++) {
-            Start-Sleep -Seconds 2
-
-            try {
-                $tunnels = Invoke-RestMethod `
-                    -Uri "http://127.0.0.1:4040/api/tunnels" `
-                    -ErrorAction Stop
-
-                if ($tunnels.tunnels.Count -gt 0) {
-                    $publicUrl = $tunnels.tunnels[0].public_url
-                    $connectionAddress = $publicUrl -replace '^tcp://', ''
-
-                    Write-Host ""
-                    Write-Host "=========================================="
-                    Write-Host "       RDP CONNECTION INFORMATION"
-                    Write-Host "=========================================="
-                    Write-Host "RDP Address: $connectionAddress"
-                    Write-Host "=========================================="
-                    Write-Host ""
-
-                    $connected = $true
-                    break
-                }
-            }
-            catch {
-                Write-Host "Waiting for ngrok..."
-            }
-        }
-
-        if (-not $connected) {
-            Write-Error "Failed to obtain ngrok tunnel URL."
-            exit 1
-        }
-
+        Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -name "UserAuthentication" -Value 1
+        copy wallpaper.png C:\Users\Public\Desktop\wallpaper.png
+        copy wallpaper.bat C:\Users\Public\Desktop\wallpaper.bat
+    - name: Open Tunnel.
+      run: Start-Process Powershell -ArgumentList '-Noexit -Command ".\ngrok\ngrok.exe tcp --region ap 3389"'
     - name: Connect to your RDP
       run: cmd /c start.bat
-
     - name: Successfully made! You can close the tab now.
       run: cmd /c loop.bat
